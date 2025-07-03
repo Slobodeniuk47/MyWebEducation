@@ -1,11 +1,11 @@
-// server/index.ts
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import session from 'express-session';
+import passport from 'passport';
+
 import userRoutes from './routes/userRoutes';
 import courseRoutes from './routes/courseRoutes';
 import authRoutes from './routes/authRoutes';
-import passport from 'passport';
-import session from 'express-session';
 
 const app = express();
 
@@ -15,7 +15,13 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use(session({ secret: process.env.SESSION_SECRET || 'session-secret', resave: false, saveUninitialized: false }));
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'session-secret',
+  resave: false,
+  saveUninitialized: false
+}));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -23,8 +29,10 @@ app.use('/users', userRoutes);
 app.use('/courses', courseRoutes);
 app.use('/auth', authRoutes);
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(`[${new Date().toISOString()}] ${req.method} ${req.url} - Error: ${err.message}\nStack: ${err.stack}`);
+// Глобальный обработчик ошибок
+app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
+  console.error(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.error(err.stack);
   res.status(500).json({ error: err.message || 'Internal Server Error' });
 });
 

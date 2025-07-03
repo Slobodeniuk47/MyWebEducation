@@ -1,3 +1,4 @@
+// server/infrastructure/services/userService.ts
 import { pool } from '../../core/db';
 import bcrypt from 'bcrypt';
 import { UserEntity } from '../../core/entities/userEntity';
@@ -18,6 +19,14 @@ export class UserService {
     const result: QueryResult<UserEntity> = await pool.query(
       `SELECT id, email, name, google_id, created_at FROM users WHERE id = $1`,
       [id]
+    );
+    return result.rows[0] || null;
+  }
+
+  async getUserByEmail(email: string): Promise<UserEntity | null> {
+    const result: QueryResult<UserEntity> = await pool.query(
+      `SELECT id, email, password, name, google_id, created_at FROM users WHERE email = $1`,
+      [email]
     );
     return result.rows[0] || null;
   }
@@ -51,7 +60,7 @@ export class UserService {
       fields.push(`google_id = $${idx++}`);
       values.push(user.googleId);
     }
-    if (fields.length === 0) return null; // нечего обновлять
+    if (fields.length === 0) return null;
 
     values.push(id);
     const query = `UPDATE users SET ${fields.join(', ')} WHERE id = $${idx} RETURNING id, email, name, google_id, created_at`;
@@ -62,7 +71,5 @@ export class UserService {
   async deleteUser(id: number): Promise<boolean> {
     const result: QueryResult = await pool.query(`DELETE FROM users WHERE id = $1`, [id]);
     return (result?.rowCount ?? 0) > 0;
-
-
   }
 }

@@ -1,15 +1,15 @@
 // server/routes/userRoutes.ts
-import { Router, RequestHandler } from 'express';
+import { Router } from 'express';
 import { createUser, getUser, getAllUsers, updateUser, deleteUser, login } from '../api/controllers/userController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
-const router = Router();
+const userRouter = Router();
 
-router.post('/', createUser as RequestHandler);
-router.post('/login', login as RequestHandler);
-router.get('/:id', authMiddleware, getUser as RequestHandler);
-router.get('/', authMiddleware, getAllUsers as RequestHandler);
-router.put('/:id', authMiddleware, updateUser as RequestHandler);
-router.delete('/:id', authMiddleware, deleteUser as RequestHandler);
+userRouter.post('/', createUser);
+userRouter.post('/login', login);
+userRouter.get('/:id', authMiddleware, getUser);
+userRouter.get('/', authMiddleware, getAllUsers);
+userRouter.put('/:id', authMiddleware, updateUser);
+userRouter.delete('/:id', authMiddleware, deleteUser);
 
-export default router;
+export default userRouter;

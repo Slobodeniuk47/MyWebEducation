@@ -1,12 +1,11 @@
 // server/api/controllers/courseController.ts
-import { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import { CourseService } from '../../infrastructure/services/courseService';
 
 const courseService = new CourseService();
 
-export const createCourse = async (req: Request, res: Response, next: NextFunction) => {
+export const createCourse = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    // Простая валидация без DTO
     if (!req.body.title) {
       return res.status(400).json({ error: 'Поле title обязательно' });
     }
@@ -17,7 +16,7 @@ export const createCourse = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-export const getCourse = async (req: Request, res: Response, next: NextFunction) => {
+export const getCourse = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
@@ -27,22 +26,22 @@ export const getCourse = async (req: Request, res: Response, next: NextFunction)
     if (!course) {
       return res.status(404).json({ error: 'Курс не найден' });
     }
-    res.json(course);
+    res.status(200).json(course);
   } catch (error) {
     next(error);
   }
 };
 
-export const getAllCourses = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllCourses = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const courses = await courseService.getAllCourses();
-    res.json(courses);
+    res.status(200).json(courses);
   } catch (error) {
     next(error);
   }
 };
 
-export const updateCourse = async (req: Request, res: Response, next: NextFunction) => {
+export const updateCourse = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
@@ -52,13 +51,13 @@ export const updateCourse = async (req: Request, res: Response, next: NextFuncti
     if (!course) {
       return res.status(404).json({ error: 'Курс не найден или нет данных для обновления' });
     }
-    res.json(course);
+    res.status(200).json(course);
   } catch (error) {
     next(error);
   }
 };
 
-export const deleteCourse = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteCourse = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {

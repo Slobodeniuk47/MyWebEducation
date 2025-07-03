@@ -3,12 +3,12 @@ import { Router, RequestHandler } from 'express';
 import { createCourse, getCourse, getAllCourses, updateCourse, deleteCourse } from '../api/controllers/courseController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
-const router = Router();
+const courseRouter = Router();
 
-router.post('/', authMiddleware, createCourse as RequestHandler);
-router.get('/:id', getCourse as RequestHandler);
-router.get('/', getAllCourses as RequestHandler);
-router.put('/:id', authMiddleware, updateCourse as RequestHandler);
-router.delete('/:id', authMiddleware, deleteCourse as RequestHandler);
+courseRouter.post('/', authMiddleware, createCourse);
+courseRouter.get('/:id', getCourse);
+courseRouter.get('/', getAllCourses);
+courseRouter.put('/:id', authMiddleware, updateCourse);
+courseRouter.delete('/:id', authMiddleware, deleteCourse);
 
-export default router;
+export default courseRouter;
