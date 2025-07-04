@@ -35,8 +35,8 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 // Основные роуты
-app.use('/users', userRoutes);
-app.use('/courses', courseRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/courses', courseRoutes);
 app.use('/auth', authRoutes);
 
 // 404 обработчик

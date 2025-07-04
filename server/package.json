@@ -8,8 +8,8 @@
     "start": "node ./dist/index.js",
     "build": "tsc -p tsconfig.json",
     "dev": "nodemon --exec ts-node ./index.ts",
-    "seederDb": "ts-node ./server/core/seederDb.ts",
-    "dropAllTablesDb": "ts-node ./server/core/dropAllTablesDb.ts"
+    "seederDb": "ts-node ./core/seederDb.ts",
+    "dropAllTablesDb": "ts-node ./core/dropAllTablesDb.ts"
   },
   "keywords": [],
   "author": "Artem Slobodeniuk",
