@@ -37,7 +37,7 @@ app.get('/', (req: Request, res: Response) => {
 // Основные роуты
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 
 // 404 обработчик
 app.use((req, res) => {

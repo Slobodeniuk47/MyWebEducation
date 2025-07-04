@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { axiosJSON } from '../../../api/axios';
 import { Link } from 'react-router-dom';
 import { User } from '../../../types/user';
+import './AdminUserList.css';
 
 export default function AdminUserList() {
   const [users, setUsers] = useState<User[]>([]);
@@ -15,7 +16,6 @@ export default function AdminUserList() {
 
   const handleDelete = async () => {
     if (!selectedUserId) return;
-    if (!window.confirm('Удалить пользователя?')) return;
 
     try {
       await axiosJSON.delete(`/users/${selectedUserId}`);
@@ -41,10 +41,14 @@ export default function AdminUserList() {
       </ul>
 
       {selectedUserId && (
-        <div>
-          <p>Удалить пользователя ID {selectedUserId}?</p>
-          <button onClick={handleDelete}>Да</button>
-          <button onClick={() => setSelectedUserId(null)}>Нет</button>
+        <div className="modal-overlay">
+          <div className="modal">
+            <p>Удалить пользователя ID {selectedUserId}?</p>
+            <div className="modal-buttons">
+              <button onClick={handleDelete} className="yes">Да</button>
+              <button onClick={() => setSelectedUserId(null)} className="no">Нет</button>
+            </div>
+          </div>
         </div>
       )}
     </div>
