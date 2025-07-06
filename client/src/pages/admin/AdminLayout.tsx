@@ -10,6 +10,7 @@ export default function AdminLayout() {
         <nav>
           <NavLink to="/admin" end>🏠 Главная</NavLink>
           <NavLink to="/admin/users">👤 Пользователи</NavLink>
+          <NavLink to="/admin/courses">📚 Курси</NavLink>
           <NavLink to="/">🔙 На сайт</NavLink>
         </nav>
       </aside>

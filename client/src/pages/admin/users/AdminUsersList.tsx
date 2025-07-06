@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { axiosJSON } from '../../../api/axios';
 import { Link } from 'react-router-dom';
 import { User } from '../../../types/user';
-import './AdminUserList.css';
+import ConfirmModal from '../../../components/ConfirmModal';
 
 export default function AdminUserList() {
   const [users, setUsers] = useState<User[]>([]);
@@ -35,22 +35,18 @@ export default function AdminUserList() {
           <li key={user.id}>
             {user.email}
             <Link to={`/admin/user/update/${user.id}`}>✏️</Link>
-            <button onClick={() => setSelectedUserId(user.id)}>🗑️</button>
+            <button onClick={() => setSelectedUserId(user.id!)}>🗑️</button>
           </li>
         ))}
       </ul>
-
       {selectedUserId && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <p>Удалить пользователя ID {selectedUserId}?</p>
-            <div className="modal-buttons">
-              <button onClick={handleDelete} className="yes">Да</button>
-              <button onClick={() => setSelectedUserId(null)} className="no">Нет</button>
-            </div>
-          </div>
-        </div>
-      )}
+  <ConfirmModal
+    message={`Видалити юзера з ID ${selectedUserId}?`}
+    onConfirm={handleDelete}
+    onCancel={() => setSelectedUserId(null)}
+  />
+)}
+
     </div>
   );
 }

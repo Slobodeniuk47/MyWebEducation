@@ -5,8 +5,13 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUserList from './pages/admin/users/AdminUsersList';
 import AdminUserCreate from './pages/admin/users/AdminUserCreate';
 import AdminUserUpdate from './pages/admin/users/AdminUserUpdate';
+
+import AdminCourseList from './pages/admin/courses/AdminCourseList';
+import AdminCourseCreate from './pages/admin/courses/AdminCourseCreate';
+import AdminCourseUpdate from './pages/admin/courses/AdminCourseUpdate';
+
 import LoginPage from './pages/auth/LoginPage';
-import PrivateRoute from './components/PrivateRoute'; // 👈 додаємо захист
+import PrivateRoute from './components/PrivateRoute';
 
 function App() {
   return (
@@ -18,12 +23,19 @@ function App() {
         {/* Захищена адмін-панель */}
         <Route path="/admin" element={<PrivateRoute><AdminLayout /></PrivateRoute>}>
           <Route index element={<AdminDashboard />} />
+          
+          {/* Користувачі */}
           <Route path="users" element={<AdminUserList />} />
           <Route path="user/create" element={<AdminUserCreate />} />
           <Route path="user/update/:id" element={<AdminUserUpdate />} />
+
+          {/* Курси */}
+          <Route path="courses" element={<AdminCourseList />} />
+          <Route path="course/create" element={<AdminCourseCreate />} />
+          <Route path="course/update/:id" element={<AdminCourseUpdate />} />
         </Route>
 
-        {/* Тут можна додати публічну головну сторінку, наприклад */}
+        {/* Можна додати публічну головну сторінку */}
         {/* <Route path="/" element={<HomePage />} /> */}
       </Routes>
     </Router>

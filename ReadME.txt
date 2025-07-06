@@ -17,5 +17,6 @@
 5. Создание БД PostgreSQL
 6. Создание seederDb.js который сИдит данные в БД по команде npm run seederDb
 7. Создание dropAllTablesDb.js удаляет все таблицы из БД.
-8. Обновленный seederDb.js с bcrypt
-9. 
+8. Обновленный seederDb.js с bcrypt (passwordHash)
+9. authMiddleWare + routes
+10. 
