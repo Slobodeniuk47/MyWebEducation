@@ -1,5 +1,5 @@
 // server/infrastructure/services/courseService.ts
-import { pool } from '../../core/db';
+import { pool } from '../../core/db'; // твой экземпляр подключения к db
 import { CourseEntity } from '../../core/entities/courseEntity';
 
 export class CourseService {

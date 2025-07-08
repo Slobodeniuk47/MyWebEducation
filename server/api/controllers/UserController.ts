@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 
 const userService = new UserService();
 
-export const createUser = async (req: Request<{}, any, any, {}>, res: Response, next: NextFunction) => {
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Поле email обязательно' });
@@ -17,7 +17,32 @@ export const createUser = async (req: Request<{}, any, any, {}>, res: Response, 
   }
 };
 
-export const login = async (req: Request<{}, any, any, {}>, res: Response, next: NextFunction) => {
+export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, password, name, roles } = req.body;
+
+    if (!email || !password)
+      return res.status(400).json({ error: 'Email и пароль обязательны' });
+
+    const existing = await userService.getUserByEmail(email);
+    if (existing)
+      return res.status(409).json({ error: 'Пользователь с таким email уже существует' });
+
+    const user = await userService.createUser({ email, password, name, roles });
+
+    const token = jwt.sign(
+      { id: user?.id, email: user?.email },
+      process.env.JWT_SECRET ?? 'your-secret-key',
+      { expiresIn: '1h' }
+    );
+
+    res.status(201).json({ token, user });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
     if (!email || !password)
@@ -29,14 +54,19 @@ export const login = async (req: Request<{}, any, any, {}>, res: Response, next:
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ error: 'Неверный email или пароль' });
 
-    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET ?? 'your-secret-key', { expiresIn: '1h' });
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET ?? 'your-secret-key',
+      { expiresIn: '1h' }
+    );
+
     res.json({ token });
   } catch (error) {
     next(error);
   }
 };
 
-export const getUser = async (req: Request<{ id: string }, any, any, {}>, res: Response, next: NextFunction) => {
+export const getUser = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: 'Некорректный ID' });
@@ -59,7 +89,7 @@ export const getAllUsers = async (_: Request, res: Response, next: NextFunction)
   }
 };
 
-export const updateUser = async (req: Request<{ id: string }, any, any, {}>, res: Response, next: NextFunction) => {
+export const updateUser = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: 'Некорректный ID' });
@@ -69,12 +99,15 @@ export const updateUser = async (req: Request<{ id: string }, any, any, {}>, res
       return res.status(404).json({ error: 'Пользователь не найден или нечего обновлять' });
 
     res.json(user);
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message?.startsWith('Unknown roles:')) {
+      return res.status(400).json({ error: error.message });
+    }
     next(error);
   }
 };
 
-export const deleteUser = async (req: Request<{ id: string }, any, any, {}>, res: Response, next: NextFunction) => {
+export const deleteUser = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: 'Некорректный ID' });

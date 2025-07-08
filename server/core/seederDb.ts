@@ -1,14 +1,10 @@
-import 'dotenv/config';
-import { Pool } from 'pg';
 import bcrypt from 'bcrypt';
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+import { pool } from '../core/db';
+import { ROLES } from '../core/constants/roles';
 
 async function seederDb() {
   try {
-    // Создаем таблицы отдельно
+    // Таблицы
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -33,30 +29,56 @@ async function seederDb() {
       );
     `);
 
-    // Хешируем пароли
-    const password1 = await bcrypt.hash('password1', 10);
-    const password2 = await bcrypt.hash('password2', 10);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS roles (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) UNIQUE NOT NULL
+      );
+    `);
 
-    // Вставляем пользователей с параметрами
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS user_roles (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        role_id INTEGER REFERENCES roles(id) ON DELETE CASCADE,
+        UNIQUE (user_id, role_id)
+      );
+    `);
+
+    // Пароли
+    const password1 = await bcrypt.hash('123456', 10);
+    const password2 = await bcrypt.hash('123456', 10);
+
+    // Юзеры
     await pool.query(
       `INSERT INTO users (email, password, name, google_id) VALUES
-       ('user1@example.com', $1, 'User One', NULL),
-       ('user2@example.com', $2, 'User Two', 'googleid123')
+       ('user1@gmail.com', $1, 'User One', NULL),
+       ('user2@gmail.com', $2, 'User Two', 'googleid123')
        ON CONFLICT (email) DO NOTHING;`,
       [password1, password2]
     );
 
-    // Вставляем курсы
+    // Роли
+    const roleValues = Object.values(ROLES).map((r, i) => `($${i + 1})`).join(',');
+    await pool.query(
+      `INSERT INTO roles (name) VALUES ${roleValues}
+       ON CONFLICT (name) DO NOTHING;`,
+      Object.values(ROLES)
+    );
+
+    // Роли юзерам
     await pool.query(`
-      INSERT INTO courses (title, description, duration, price, sale, author_id) VALUES
-      ('Курс по трейдингу', 'Учимся торговать на бирже с нуля', '4 недели', 99.99, 20, 1),
-      ('Основы криптовалют', 'Введение в криптовалюты и блокчейн', '6 недель', 149.00, 30, 2)
-      ON CONFLICT (title) DO NOTHING;
-    `);
+      INSERT INTO user_roles (user_id, role_id)
+      SELECT u.id, r.id
+      FROM users u, roles r
+      WHERE (u.email = 'user1@gmail.com' AND r.name = $1)
+         OR (u.email = 'user2@gmail.com' AND r.name = $2)
+      ON CONFLICT (user_id, role_id) DO NOTHING;
+    `, [ROLES.ADMIN, ROLES.USER]);
 
     console.log('✅ Сидинг завершён успешно!');
   } catch (err) {
-    console.error('Ошибка при сидинге:', err);
+    console.error('❌ Ошибка при сидинге:', err);
   } finally {
     await pool.end();
   }

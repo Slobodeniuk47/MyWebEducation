@@ -5,6 +5,8 @@ import passport from 'passport';
 import userRoutes from './routes/userRoutes';
 import courseRoutes from './routes/courseRoutes';
 import authRoutes from './routes/authRoutes';
+import roleRoutes from './routes/roleRoutes';
+
 
 const app = express();
 
@@ -38,6 +40,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/roles', roleRoutes);
 
 // 404 обработчик
 app.use((req, res) => {

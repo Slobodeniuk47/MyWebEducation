@@ -7,4 +7,5 @@ export interface UserEntity {
   name?: string | null;
   googleId?: string | null; //тоже может быть null, если зарегистрировался через email.
   createdAt?: Date; //автоустанавливается PostgreSQL через DEFAULT CURRENT_TIMESTAMP.
+  roles?: string[]; // добавим сюда массив названий ролей
 }
