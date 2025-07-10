@@ -2,41 +2,68 @@ import { pool } from '../../core/db';
 import bcrypt from 'bcrypt';
 import { UserEntity } from '../../core/entities/userEntity';
 import { QueryResult } from 'pg';
-import { DEFAULT_ROLE } from '../../core/constants/roles'; //core/constants/roles.ts
+import { DEFAULT_ROLE } from '../../core/constants/roles';
+import { GoogleExternalLoginDto } from '../dtos/googleExternalLoginDto';
+import { OAuth2Client } from 'google-auth-library';
 
+const client = new OAuth2Client(process.env.GOOGLE_AUTH_CLIENT_ID);
 
 export class UserService {
   async createUser(user: UserEntity): Promise<UserEntity | null> {
-  const hashedPassword = user.password ? await bcrypt.hash(user.password, 10) : null;
+    const hashedPassword = user.password ? await bcrypt.hash(user.password, 10) : null;
 
-  // Спочатку створюємо користувача
-  const result: QueryResult<UserEntity> = await pool.query(
-    `INSERT INTO users (email, password, name, google_id)
-     VALUES ($1, $2, $3, $4)
-     RETURNING id, email, name, google_id, created_at`,
-    [user.email, hashedPassword, user.name || null, user.googleId || null]
-  );
-
-  const createdUser = result.rows[0];
-
-  // Отримуємо ID ролі USER (DEFAULT_ROLE)
-  const roleResult = await pool.query(
-    `SELECT id FROM roles WHERE name = $1`,
-    [DEFAULT_ROLE]
-  );
-
-  const userRoleId = roleResult.rows[0]?.id;
-  if (userRoleId) {
-    await pool.query(
-      `INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)
-       ON CONFLICT (user_id, role_id) DO NOTHING`,
-      [createdUser.id, userRoleId]
+    const result: QueryResult<UserEntity> = await pool.query(
+      `INSERT INTO users (email, password, name, google_id)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, email, name, google_id, created_at`,
+      [user.email, hashedPassword, user.name || null, user.googleId || null]
     );
+
+    const createdUser = result.rows[0];
+
+    const roleResult = await pool.query(`SELECT id FROM roles WHERE name = $1`, [DEFAULT_ROLE]);
+    const userRoleId = roleResult.rows[0]?.id;
+
+    if (userRoleId) {
+      await pool.query(
+        `INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)
+         ON CONFLICT (user_id, role_id) DO NOTHING`,
+        [createdUser.id, userRoleId]
+      );
+    }
+
+    return this.getUserById(createdUser.id!);
   }
 
-  // Повертаємо повну інформацію (з ролями)
-  return this.getUserById(createdUser.id!);
-}
+  async googleExternalLogin(dto: GoogleExternalLoginDto): Promise<UserEntity> {
+    if (dto.provider !== 'google') {
+      throw new Error('Поддерживается только Google login');
+    }
+
+    const ticket = await client.verifyIdToken({
+      idToken: dto.token,
+      audience: process.env.GOOGLE_AUTH_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      throw new Error('Невалидный Google токен');
+    }
+
+    const { email, name, sub: googleId } = payload;
+
+    let user = await this.getUserByEmail(email);
+
+    if (!user) {
+      user = await this.createUser({
+        email,
+        name: name || null,
+        googleId,
+      });
+    }
+
+    return user!;
+  }
 
   async getUserById(id: number): Promise<UserEntity | null> {
     const result = await pool.query(
@@ -52,7 +79,6 @@ export class UserService {
       `,
       [id]
     );
-
     return result.rows[0] || null;
   }
 
@@ -76,7 +102,6 @@ export class UserService {
       GROUP BY u.id
       `
     );
-
     return result.rows;
   }
 
@@ -103,16 +128,13 @@ export class UserService {
       values.push(user.googleId);
     }
 
-    // Обновление основных данных
     if (fields.length > 0) {
       values.push(id);
       const query = `UPDATE users SET ${fields.join(', ')} WHERE id = $${idx} RETURNING id, email, name, google_id, created_at`;
       await pool.query(query, values);
     }
 
-    // Обновление ролей (если переданы)
     if (user.roles && Array.isArray(user.roles)) {
-      // Проверяем, что все роли существуют
       const roleCheck = await pool.query(
         `SELECT name FROM roles WHERE name = ANY($1::text[])`,
         [user.roles]
@@ -123,7 +145,6 @@ export class UserService {
         throw new Error(`Unknown roles: ${unknownRoles.join(', ')}`);
       }
 
-      // Обновляем роли пользователя
       await pool.query(`DELETE FROM user_roles WHERE user_id = $1`, [id]);
 
       const roleIdsResult = await pool.query(

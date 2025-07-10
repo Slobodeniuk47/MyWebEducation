@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../../infrastructure/services/userService';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import { GoogleExternalLoginDto } from '../../infrastructure/dtos/googleExternalLoginDto';
 
 const userService = new UserService();
 
@@ -20,7 +21,6 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password, name, roles } = req.body;
-
     if (!email || !password)
       return res.status(400).json({ error: 'Email и пароль обязательны' });
 
@@ -61,6 +61,27 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     );
 
     res.json({ token });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const googleLogin = async (req: Request<{}, {}, GoogleExternalLoginDto>, res: Response, next: NextFunction) => {
+  try {
+    const { token, provider } = req.body;
+    if (!token || !provider) {
+      return res.status(400).json({ error: 'Token и provider обязательны' });
+    }
+
+    const user = await userService.googleExternalLogin({ token, provider });
+
+    const jwtToken = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET ?? 'your-secret-key',
+      { expiresIn: '1h' }
+    );
+
+    res.json({ token: jwtToken, user });
   } catch (error) {
     next(error);
   }
