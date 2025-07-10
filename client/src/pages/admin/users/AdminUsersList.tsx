@@ -9,7 +9,7 @@ export default function AdminUserList() {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   useEffect(() => {
-    axiosJSON.get('/users')
+    axiosJSON.get('/users/getAll')
       .then(res => setUsers(res.data))
       .catch(err => console.error(err));
   }, []);
@@ -18,7 +18,7 @@ export default function AdminUserList() {
     if (!selectedUserId) return;
 
     try {
-      await axiosJSON.delete(`/users/${selectedUserId}`);
+      await axiosJSON.delete(`/users/deleteById/${selectedUserId}`);
       setUsers(prev => prev.filter(user => user.id !== selectedUserId));
       setSelectedUserId(null);
     } catch (err) {

@@ -5,10 +5,10 @@ import { authMiddleware } from '../middleware/authMiddleware';
 
 const courseRouter = Router();
 
-courseRouter.post('/', authMiddleware, createCourse);
+courseRouter.post('/create/', authMiddleware, createCourse);
 courseRouter.get('/getById/:id', getCourse);
 courseRouter.get('/getAll', getAllCourses);
-courseRouter.put('updateById/:id', authMiddleware, updateCourse);
-courseRouter.delete('deleteById/:id', authMiddleware, deleteCourse);
+courseRouter.put('/updateById/:id', authMiddleware, updateCourse);
+courseRouter.delete('/deleteById/:id', authMiddleware, deleteCourse);
 
 export default courseRouter;

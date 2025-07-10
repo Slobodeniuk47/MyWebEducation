@@ -4,26 +4,28 @@ import { axiosJSON } from '../../api/axios';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { APP_ENV } from '../../env';
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
-      const response = await axiosJSON.post<{ token: string }>('/users/login', {
+      const response = await axiosJSON.post<{ token: string; user: any }>('/users/register', {
         email,
+        name,
         password,
       });
       localStorage.setItem('token', response.data.token);
       navigate('/admin/users');
     } catch (error) {
-      console.error('Ошибка при входе:', error);
-      alert('Неверные учетные данные');
+      console.error('Ошибка при регистрации:', error);
+      alert('Ошибка при регистрации');
     }
   };
 
-  const handleGoogleLogin = async (token: string) => {
+  const handleGoogleRegister = async (token: string) => {
     try {
       const response = await axiosJSON.post<{ token: string }>('/users/googleLogin', {
         token,
@@ -32,8 +34,8 @@ const LoginPage = () => {
       localStorage.setItem('token', response.data.token);
       navigate('/admin/users');
     } catch (error) {
-      console.error('Ошибка Google входа:', error);
-      alert('Ошибка при входе через Google');
+      console.error('Ошибка Google регистрации:', error);
+      alert('Ошибка при регистрации через Google');
     }
   };
 
@@ -41,7 +43,15 @@ const LoginPage = () => {
     <GoogleOAuthProvider clientId={APP_ENV.GOOGLE_AUTH_CLIENT_ID}>
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md space-y-6">
-          <h2 className="text-2xl font-semibold text-center">Вход в аккаунт</h2>
+          <h2 className="text-2xl font-semibold text-center">Регистрация</h2>
+
+          <input
+            type="text"
+            placeholder="Имя"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
 
           <input
             type="email"
@@ -60,10 +70,10 @@ const LoginPage = () => {
           />
 
           <button
-            onClick={handleLogin}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-200"
+            onClick={handleRegister}
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition duration-200"
           >
-            Войти
+            Зарегистрироваться
           </button>
 
           <div className="text-center text-gray-500">или</div>
@@ -71,11 +81,11 @@ const LoginPage = () => {
           <GoogleLogin
             onSuccess={(credentialResponse) => {
               if (credentialResponse.credential) {
-                handleGoogleLogin(credentialResponse.credential);
+                handleGoogleRegister(credentialResponse.credential);
               }
             }}
             onError={() => {
-              alert('Google авторизация не удалась');
+              alert('Google регистрация не удалась');
             }}
           />
         </div>
@@ -84,4 +94,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

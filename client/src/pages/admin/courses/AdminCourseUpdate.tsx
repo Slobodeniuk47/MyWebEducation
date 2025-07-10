@@ -9,7 +9,7 @@ export default function AdminCourseUpdate() {
   const [course, setCourse] = useState<Course | null>(null);
 
   useEffect(() => {
-    axiosJSON.get(`/courses/${id}`)
+    axiosJSON.get(`/courses/getById/${id}`)
       .then(res => setCourse(res.data))
       .catch(err => console.error(err));
   }, [id]);
@@ -26,7 +26,7 @@ export default function AdminCourseUpdate() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axiosJSON.put(`/courses/${id}`, course);
+      await axiosJSON.put(`/courses/updateById/${id}`, course);
       navigate('/admin/courses');
     } catch (err) {
       console.error(err);

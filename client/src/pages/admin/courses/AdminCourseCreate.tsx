@@ -24,7 +24,7 @@ export default function AdminCourseCreate() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axiosJSON.post('/courses', course);
+      await axiosJSON.post('/courses/create', course);
       navigate('/admin/courses');
     } catch (err) {
       console.error(err);

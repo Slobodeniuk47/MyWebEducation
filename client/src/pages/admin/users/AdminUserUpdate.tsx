@@ -12,7 +12,7 @@ const AdminUserUpdate: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axiosJSON.get(`/users/${id}`);
+        const res = await axiosJSON.get(`/users/getById/${id}`);
         setEmail(res.data.email);
       } catch {
         setError('Ошибка загрузки пользователя');
@@ -24,7 +24,7 @@ const AdminUserUpdate: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axiosJSON.put(`/users/${id}`, { email });
+      await axiosJSON.put(`/users/updateById/${id}`, { email });
       navigate('/admin/users');
     } catch {
       setError('Ошибка при обновлении пользователя');

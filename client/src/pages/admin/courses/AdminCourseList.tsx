@@ -9,7 +9,7 @@ export default function AdminCoursesList() {
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
 
   useEffect(() => {
-    axiosJSON.get('/courses')
+    axiosJSON.get('/courses/getAll')
       .then(res => setCourses(res.data))
       .catch(err => console.error(err));
   }, []);
@@ -17,7 +17,7 @@ export default function AdminCoursesList() {
   const handleDelete = async () => {
     if (!selectedCourseId) return;
     try {
-      await axiosJSON.delete(`/courses/${selectedCourseId}`);
+      await axiosJSON.delete(`/courses/deleteById/${selectedCourseId}`);
       setCourses(prev => prev.filter(course => course.id !== selectedCourseId));
       setSelectedCourseId(null);
     } catch (err) {

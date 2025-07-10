@@ -12,13 +12,15 @@ import AdminCourseUpdate from './pages/admin/courses/AdminCourseUpdate';
 
 import LoginPage from './pages/auth/LoginPage';
 import PrivateRoute from './components/PrivateRoute';
+import RegisterPage from './pages/auth/RegisterPage';
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Сторінка логіну */}
+        {/* Сторінкu login/register */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
         {/* Захищена адмін-панель */}
         <Route path="/admin" element={<PrivateRoute><AdminLayout /></PrivateRoute>}>

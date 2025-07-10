@@ -12,7 +12,7 @@ const AdminUserCreate: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axiosJSON.post('/users', { email, password });
+      await axiosJSON.post('/users/create', { email, password });
       navigate('/admin/users');
     } catch (err) {
       setError('Ошибка при создании пользователя');
