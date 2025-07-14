@@ -3,9 +3,37 @@ import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
 import './HomePage.css';
 import VideoPlayer from '../components/VideoPlayer/VideoPlayer';
+import PhotoSlider from '../components/PhotoSlider/PhotoSlider';
 
 const HomePage = () => {
   const [showVideo, setShowVideo] = useState(true); // сразу показываем видео
+
+  const beforePhotos = [
+  '/images/case1.png',
+  '/images/case2.png',
+  '/images/case1.png',
+  '/images/case2.png',
+  '/images/case1.png',
+  '/images/case2.png',
+  '/images/case1.png',
+    '/images/case2.png',
+  '/images/case1.png',
+  '/images/case2.png',
+ 
+];
+
+const afterPhotos = [
+  '/images/case1.png',
+  '/images/case2.png',
+  '/images/case1.png',
+  '/images/case2.png',
+  '/images/case1.png',
+  '/images/case2.png',
+  '/images/case1.png',
+    '/images/case2.png',
+  '/images/case1.png',
+  '/images/case2.png',
+];
   return (
     <div className="homepage">
       {/* Hero */}
@@ -68,21 +96,27 @@ const HomePage = () => {
         <h2 className="section-title">Тарифы</h2>
         <div className="tariffs">
           <div className="tariff">
-            <h3>Lite</h3>
+            <h3>Базовый</h3>
             <p>Доступ к урокам</p>
-            <strong>499€</strong>
+            <strong>499$</strong>
             <Link to="/register" className="btn">Выбрать</Link>
           </div>
           <div className="tariff highlight">
-            <h3>Standard</h3>
+            <h3>Стандарт</h3>
             <p>Уроки + поддержка + чат</p>
-            <strong>799€</strong>
+            <strong>799$</strong>
             <Link to="/register" className="btn">Выбрать</Link>
           </div>
           <div className="tariff">
-            <h3>Premium</h3>
+            <h3>Продвинутый</h3>
             <p>Всё выше + лайвы + личный разбор</p>
-            <strong>1499€</strong>
+            <strong>999$</strong>
+            <Link to="/register" className="btn">Выбрать</Link>
+          </div>
+          <div className="tariff">
+            <h3>Менторство</h3>
+            <p>Всё выше + лайвы + личный разбор</p>
+            <strong>1499$</strong>
             <Link to="/register" className="btn">Выбрать</Link>
           </div>
         </div>
@@ -91,7 +125,7 @@ const HomePage = () => {
 
       {showVideo && (
         <VideoPlayer
-          src="/videos/preview1.mkv"  // путь к видео в public/videos
+          src="/videos/preview.mkv"  // путь к видео в public/videos
           onClose={() => setShowVideo(false)}
         />
       )}
@@ -99,7 +133,7 @@ const HomePage = () => {
 
 
 
-      {/* About */}
+      {/* About me*/}
       <section className="section">
         <h2 className="section-title">Обо мне</h2>
         <div className="about">
@@ -108,7 +142,24 @@ const HomePage = () => {
           </p>
         </div>
       </section>
-
+      {/* My Journey Before Crypto */}
+  <PhotoSlider
+    title="Кем я был до крипты"
+    subtitle="Фото из прошлого — путь с самого нуля"
+    photos={beforePhotos}
+    photoWidth={383}
+    photoHeight={270}
+    zoomOnHover={true}
+  />
+  {/* How Crypto Changed My Life */}
+  <PhotoSlider
+    title="Как крипта изменила мою жизнь"
+    subtitle="Теперь я сам создаю свою реальность"
+    photos={afterPhotos}
+    photoWidth={320}
+    photoHeight={200}
+    zoomOnHover={true}
+  />
       {/* Motivation */}
       <section className="section motivation">
         <h2>Ты можешь начать прямо сейчас</h2>
@@ -180,31 +231,17 @@ const HomePage = () => {
           </div>
           <div className="card">
             <h3>Личный созвон</h3>
-            <p>1:1 консультация при покупке тарифа Premium.</p>
+            <p>1:1 консультация при покупке тарифа Менторство.</p>
           </div>
         </div>
       </section>
 
       {/* Screenshots Section */}
-      <section className="section light">
-        <h2 className="section-title">Мои сделки</h2>
-        <p className="text-center mb-8 text-gray-700">Реальные трейды, опубликованные в Telegram</p>
-        <div className="screenshots">
-          <img src="/images/case1.png" alt="Сделка 1" />
-          <img src="/images/case2.png" alt="Сделка 2" />
-          <img src="/images/case1.png" alt="Сделка 3" />
-          <img src="/images/case1.png" alt="Сделка 1" />
-          <img src="/images/case2.png" alt="Сделка 2" />
-          <img src="/images/case1.png" alt="Сделка 3" />
-          <img src="/images/case1.png" alt="Сделка 1" />
-          <img src="/images/case2.png" alt="Сделка 2" />
-          <img src="/images/case1.png" alt="Сделка 3" />
-          <img src="/images/case1.png" alt="Сделка 1" />
-          <img src="/images/case2.png" alt="Сделка 2" />
-          <img src="/images/case1.png" alt="Сделка 3" />
-        </div>
-      </section>
-
+      <PhotoSlider
+    title="Мои сделки"
+    subtitle="Реальные трейды, опубликованные в Telegram"
+    photos={beforePhotos}
+  />
       {/* FAQ Section */}
 <section className="section">
   <h2 className="section-title">Частые вопросы</h2>
