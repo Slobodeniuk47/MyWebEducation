@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "node server/index.js",
+    "server": "npm run --prefix server",
     "client": "npm start --prefix client",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
